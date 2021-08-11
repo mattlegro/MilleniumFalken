@@ -3,6 +3,7 @@
 #include <ctime>
 #include <math.h>
 #include <string>
+#include <assert.h>
 
 #include "rlbot/bot.h"
 #include "rlbot/color.h"
@@ -10,6 +11,7 @@
 #include "rlbot/rlbot_generated.h"
 #include "rlbot/scopedrenderer.h"
 #include "rlbot/statesetting.h"
+#include "falken/service.h"
 
 #define PI 3.1415
 
@@ -30,6 +32,25 @@ ExampleBot::ExampleBot(int _index, int _team, std::string _name)
   gamestate.carStates[_index] = carstate;
 
   rlbot::Interface::SetGameState(gamestate);
+
+  std::shared_ptr<falken::Service> service = falken::Service::Connect(
+      nullptr, nullptr, nullptr);
+
+  static const char* kBrainName = "MilleniumFalken";
+  const char* brain_id;
+  const char* snapshot_id;
+
+  using MyBrainSpec = falken::BrainSpec<MyObservations, MyActions>;
+
+  std::unique_ptr<falken::Brain<MyBrainSpec>> brain =
+      service->CreateBrain<MyBrainSpec>(kBrainName);
+
+  std::shared_ptr<falken::Session> session =
+      brain->StartSession(falken::Session::kTypeInteractiveTraining, kMaxSteps);
+
+  std::shared_ptr<falken::Episode> episode = session->StartEpisode();
+
+
 }
 
 ExampleBot::~ExampleBot() {
@@ -48,28 +69,28 @@ rlbot::Controller ExampleBot::GetOutput(rlbot::GameTickPacket gametickpacket) {
       *gametickpacket->players()->Get(index)->physics()->rotation();
 
   // Calculate the velocity of the ball.
-  float velocity = sqrt(ballVelocity.x() * ballVelocity.x() +
-                        ballVelocity.y() * ballVelocity.y() +
-                        ballVelocity.z() * ballVelocity.z());
+  //float velocity = sqrt(ballVelocity.x() * ballVelocity.x() +
+  //                      ballVelocity.y() * ballVelocity.y() +
+  //                      ballVelocity.z() * ballVelocity.z());
 
   // This renderer will build and send the packet once it goes out of scope.
-  rlbot::ScopedRenderer renderer("test");
+  //rlbot::ScopedRenderer renderer("test");
 
   // Load the ballprediction into a vector to use for rendering.
-  std::vector<const rlbot::flat::Vector3 *> points;
+  //std::vector<const rlbot::flat::Vector3 *> points;
 
-  rlbot::BallPrediction ballprediction = GetBallPrediction();
+  //rlbot::BallPrediction ballprediction = GetBallPrediction();
 
-  for (uint32_t i = 0; i < ballprediction->slices()->size(); i++) {
-    points.push_back(ballprediction->slices()->Get(i)->physics()->location());
-  }
+  //for (uint32_t i = 0; i < ballprediction->slices()->size(); i++) {
+  //  points.push_back(ballprediction->slices()->Get(i)->physics()->location());
+  //}
 
-  renderer.DrawPolyLine3D(rlbot::Color::red, points);
+  //renderer.DrawPolyLine3D(rlbot::Color::red, points);
 
-  renderer.DrawString2D("Hello world!", rlbot::Color::green,
-                        rlbot::flat::Vector3{10, 10, 0}, 4, 4);
-  renderer.DrawString3D(std::to_string(velocity), rlbot::Color::magenta,
-                        ballLocation, 2, 2);
+  //renderer.DrawString2D("Hello world!", rlbot::Color::green,
+  //                      rlbot::flat::Vector3{10, 10, 0}, 4, 4);
+  //renderer.DrawString3D(std::to_string(velocity), rlbot::Color::magenta,
+  //                      ballLocation, 2, 2);
 
   // Calculate to get the angle from the front of the bot's car to the ball.
   double botToTargetAngle = atan2(ballLocation.y() - carLocation.y(),
