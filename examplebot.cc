@@ -11,7 +11,6 @@
 #include "rlbot/rlbot_generated.h"
 #include "rlbot/scopedrenderer.h"
 #include "rlbot/statesetting.h"
-#include "falken/service.h"
 
 #define PI 3.1415
 
@@ -33,24 +32,34 @@ ExampleBot::ExampleBot(int _index, int _team, std::string _name)
 
   rlbot::Interface::SetGameState(gamestate);
 
-  std::shared_ptr<falken::Service> service = falken::Service::Connect(
+  falken::ObservationsBase observations;
+  falken::EntityBase ball(observations, "ball");
+
+  falken::ActionsBase actions;
+
+  falken::AttributeBase steering(actions, "steering",
+      falken::kAxesModeDeltaPitchYaw,
+      falken::kControlledEntityPlayer,
+      falken::kControlFramePlayer);
+  falken::AttributeBase throttle(actions, "throttle", -1.0f, 1.0f);
+
+  falken::BrainSpecBase brain_spec_base(&observations, &actions);
+
+  service = falken::Service::Connect(
       nullptr, nullptr, nullptr);
 
   static const char* kBrainName = "MilleniumFalken";
   const char* brain_id;
   const char* snapshot_id;
 
-  using MyBrainSpec = falken::BrainSpec<MyObservations, MyActions>;
+  brain = service->CreateBrain(kBrainName, brain_spec_base);
 
-  std::unique_ptr<falken::Brain<MyBrainSpec>> brain =
-      service->CreateBrain<MyBrainSpec>(kBrainName);
+  int kMaxSteps = 500;
 
-  std::shared_ptr<falken::Session> session =
-      brain->StartSession(falken::Session::kTypeInteractiveTraining, kMaxSteps);
+  session = brain->StartSession(
+      falken::Session::kTypeInteractiveTraining, kMaxSteps);
 
-  std::shared_ptr<falken::Episode> episode = session->StartEpisode();
-
-
+  episode = session->StartEpisode();
 }
 
 ExampleBot::~ExampleBot() {
@@ -59,14 +68,20 @@ ExampleBot::~ExampleBot() {
 
 rlbot::Controller ExampleBot::GetOutput(rlbot::GameTickPacket gametickpacket) {
 
+  auto& brain_spec = brain->brain_spec_base();
+    
   rlbot::flat::Vector3 ballLocation =
       *gametickpacket->ball()->physics()->location();
-  rlbot::flat::Vector3 ballVelocity =
-      *gametickpacket->ball()->physics()->velocity();
+  //rlbot::flat::Vector3 ballVelocity =
+  //    *gametickpacket->ball()->physics()->velocity();
   rlbot::flat::Vector3 carLocation =
       *gametickpacket->players()->Get(index)->physics()->location();
   rlbot::flat::Rotator carRotation =
       *gametickpacket->players()->Get(index)->physics()->rotation();
+
+  brain_spec.observations_base().position.set_value(carLocation);
+  brain_spec.observations_base().rotation.set_value(carRotation);
+  brain_spec.observations_base().entity("ball")->position.set_value(ballLocation);
 
   // Calculate the velocity of the ball.
   //float velocity = sqrt(ballVelocity.x() * ballVelocity.x() +
@@ -111,6 +126,16 @@ rlbot::Controller ExampleBot::GetOutput(rlbot::GameTickPacket gametickpacket) {
     controller.steer = -1;
 
   controller.throttle = 1.0f;
+
+  brain_spec.actions_base().set_source(
+      falken::ActionsBase::kSourceHumanDemonstration);
+
+  brain_spec.actions_base().attribute("steering")->set_joystick_x_axis(
+      controller.steer);
+  brain_spec.actions_base().attribute("steering")->set_joystick_y_axis(0);
+  brain_spec.actions_base().attribute("throttle")->set_number(
+      controller.throttle);
+
 
   return controller;
 }
