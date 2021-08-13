@@ -79,9 +79,16 @@ rlbot::Controller ExampleBot::GetOutput(rlbot::GameTickPacket gametickpacket) {
   rlbot::flat::Rotator carRotation =
       *gametickpacket->players()->Get(index)->physics()->rotation();
 
-  brain_spec.observations_base().position.set_value(carLocation);
-  brain_spec.observations_base().rotation.set_value(carRotation);
-  brain_spec.observations_base().entity("ball")->position.set_value(ballLocation);
+  vec3 v = vec3({carRotation.roll(),carRotation.pitch(),carRotation.yaw()});
+  mat3 m = euler_to_rotation(v);
+  quaternion quat = rotation_to_quaternion(m);
+
+  brain_spec.observations_base().position.set_value(falken::Position({
+      carLocation.x(),carLocation.y(),carLocation.z() }));
+  brain_spec.observations_base().rotation.set_value(falken::Rotation({
+      quat[0],quat[1],quat[2],quat[3]}));
+  brain_spec.observations_base().entity("ball")->position.set_value(
+      falken::Position({ballLocation.x(),ballLocation.y(),ballLocation.z()}));
 
   // Calculate the velocity of the ball.
   //float velocity = sqrt(ballVelocity.x() * ballVelocity.x() +

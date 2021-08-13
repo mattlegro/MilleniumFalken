@@ -7,8 +7,11 @@ add_subdirectory(RLBotCPP)
 
 add_executable(CPPExampleBot main.cc examplebot.cc examplebot.h)
 target_include_directories(CPPExampleBot PRIVATE RLBotCPP/inc RLBotCPP/lib/inc)
+target_include_directories(CPPExampleBot PRIVATE C:/Users/mattl/Documents/FlatironRepos/RLUtilities)
+
 
 target_link_libraries(CPPExampleBot falken_cpp_sdk)
+target_link_libraries(CPPExampleBot RLUtilities)
 
 if (UNIX)
     target_link_libraries(CPPExampleBot RLBotCPP pthread)

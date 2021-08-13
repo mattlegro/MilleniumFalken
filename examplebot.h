@@ -7,6 +7,7 @@
 #include "falken/observations.h"
 #include "falken/service.h"
 #include "falken/session.h"
+#include "inc/linear_algebra/math.h"
 
 class ExampleBot : public rlbot::Bot {
 public:
