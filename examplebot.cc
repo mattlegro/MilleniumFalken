@@ -79,8 +79,8 @@ rlbot::Controller ExampleBot::GetOutput(rlbot::GameTickPacket gametickpacket) {
   rlbot::flat::Rotator carRotation =
       *gametickpacket->players()->Get(index)->physics()->rotation();
 
-  vec3 v = vec3({carRotation.roll(),carRotation.pitch(),carRotation.yaw()});
-  mat3 m = euler_to_rotation(v);
+  vec3 car_r = vec3({carRotation.roll(),carRotation.pitch(),carRotation.yaw()});
+  mat3 m = euler_to_rotation(car_r);
   quaternion quat = rotation_to_quaternion(m);
 
   brain_spec.observations_base().position.set_value(falken::Position({
@@ -143,6 +143,31 @@ rlbot::Controller ExampleBot::GetOutput(rlbot::GameTickPacket gametickpacket) {
   brain_spec.actions_base().attribute("throttle")->set_number(
       controller.throttle);
 
+  episode->Step(0.f);
+
+  if (episode->completed()) {
+      episode = nullptr;
+      episode = session->StartEpisode();
+  }
+
+  if (last_touch_time == 0.f) {
+      last_touch_time = gametickpacket->ball()->latestTouch()->gameSeconds();
+  }
+  float new_touch_time = gametickpacket->ball()->latestTouch()->gameSeconds();
+  if (new_touch_time != last_touch_time) {
+      episode->Complete(falken::Episode::kCompletionStateSuccess);
+      last_touch_time = new_touch_time;
+      episode = session->StartEpisode();
+  }
+
+  if (gametickpacket->gameInfo()->isMatchEnded()) {
+      episode->Complete(falken::Episode::kCompletionStateAborted);
+      episode = nullptr;
+      auto snapshot_id = session->Stop();
+      session = nullptr;
+      brain = nullptr;
+      service = nullptr;
+  }
 
   return controller;
 }

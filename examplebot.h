@@ -21,6 +21,6 @@ private:
   std::shared_ptr<falken::Session> session;
   std::shared_ptr<falken::Episode> episode;
 
-  const int kMaxSteps = 500;
-  bool eval_complete_ = false;
+  const int kMaxSteps = 120 * 60 * 1;
+  float last_touch_time = 0.f;
 };
