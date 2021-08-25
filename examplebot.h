@@ -17,6 +17,7 @@ public:
 
 private:
   bool ExampleBot::InitializeFalken();
+  bool ExampleBot::FloatEquals(float a, float b);
 
   std::shared_ptr<falken::Service> service;
   std::shared_ptr<falken::BrainBase> brain;
@@ -26,4 +27,5 @@ private:
   const int kMaxSteps = 240 * 60 * 1;
   float last_touch_time = 0.f;
   bool initialized = false;
+  float absTol = .0005;
 };

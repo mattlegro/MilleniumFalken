@@ -4,6 +4,7 @@
 #include <math.h>
 #include <string>
 #include <assert.h>
+#include <iostream>
 
 #include "rlbot/bot.h"
 #include "rlbot/color.h"
@@ -132,14 +133,28 @@ rlbot::Controller ExampleBot::GetOutput(rlbot::GameTickPacket gametickpacket) {
       episode = session->StartEpisode();
   }
 
-  //if (last_touch_time == 0.f) {
-  //    last_touch_time = gametickpacket->ball()->latestTouch()->gameSeconds();
-  //}
-  //float new_touch_time = gametickpacket->ball()->latestTouch()->gameSeconds();
-  //if (new_touch_time != last_touch_time) {
-  //    episode->Complete(falken::Episode::kCompletionStateSuccess);
-  //    last_touch_time = new_touch_time;
-  //    episode = session->StartEpisode();
+  if (gametickpacket->ball()->latestTouch() != NULL) {
+      float new_touch_time = gametickpacket->ball()->latestTouch()->gameSeconds();
+      int new_touch_player = gametickpacket->ball()->latestTouch()->playerIndex();
+      if (last_touch_time == 0.f) {
+          last_touch_time = gametickpacket->ball()->latestTouch()->gameSeconds();
+      }
+      if (!FloatEquals(new_touch_time, last_touch_time) && new_touch_player == index) {
+          std::cout << "I touched it!!";
+          //std::cout << "New Touch Time:" << new_touch_time;
+          episode->Complete(falken::Episode::kCompletionStateSuccess);
+          last_touch_time = new_touch_time;
+          episode = session->StartEpisode();
+      }
+  } 
+
+  //if (gametickpacket->players()->Get(index)->scoreInfo()->goals()) {
+  //    episode->Complete(falken::Episode::kCompletionStateAborted);
+  //    episode = nullptr;
+  //    auto snapshot_id = session->Stop();
+  //    session = nullptr;
+  //    brain = nullptr;
+  //    service = nullptr;
   //}
 
   if (gametickpacket->gameInfo()->isMatchEnded()) {
@@ -171,7 +186,7 @@ bool ExampleBot::InitializeFalken() {
 
     static const char *kJsonConfig = nullptr;
     static const char* project_id = nullptr; /*"MilleniumFalken";*/
-    static const char* api_key = nullptr;  /*"4qw5VdOpS1K4iMgBfiV3GA==";*/
+    static const char* api_key = nullptr;  
     service = falken::Service::Connect(
         project_id, api_key, kJsonConfig);
 
@@ -186,4 +201,7 @@ bool ExampleBot::InitializeFalken() {
 
     episode = session->StartEpisode();
     return true;
+}
+bool ExampleBot::FloatEquals(float a, float b) {
+    return (std::abs(a - b) <= absTol * std::max({ 1.0f, std::abs(a), std::abs(b) }));
 }
