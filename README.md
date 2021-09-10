@@ -1,36 +1,33 @@
-# CPPExampleBot
+# Millenium Falken
 
-### Prerequisites
- - Python 3.6 or 3.7
- - CMake 3.8 and higher
- - Compiler with c++17 support
-   - GCC 8.1 and higher (9.1 if using mingw)
-   - Visual studion 2017 and higher
-   - Clang 7 and higher (not tested)
+## Problem Statement
 
-## How to use:
- - Make sure you've installed [Python 3.7 64 bit](https://www.python.org/downloads/). During installation:
-   - Select "Add Python to PATH"
-   - Make sure pip is included in the installation
- - Clone this repository by running: `git clone https://github.com/kipje13/CPPExampleBot.git --recursive`
- - Ensure that rlbot is installed on python by running `rlbot/run.bat`. You can shut it down again if it works.
- - Make sure you have CMake. If you don't have it, visit https://cmake.org/download/ and run the Windows win64-x64 Installer.
- - If you'd like to use Visual Studio for development:
-   - Download Visual Studio from https://visualstudio.microsoft.com/.
-   - In a command prompt (use a fresh one if you just installed cmake), navigate to the folder and run `cmake .`
-   - Open Visual Studio and open the .sln file which now exists in the folder.
-   - Confirm that Build->Build Solution works.
-   - Right click on CPPExampleBot in the solution explorer and choose 'Set as StartUp Project'
-   - Start a match by executing `rlbot/run.bat`
-   - Choose Debug->Start Debugging (or F5), or press the green play button in Visual Studio.
-   - Open up examplebot.cc and start changing stuff! Visual Studio has a restart button you can press (or Ctrl+Shift+F5) when you want to recompile and try your new changes.
- 
-## Auto-start
-The rlbot framework has the ability to launch the bot executable automatically. This is usefull when sharing your bot and usually required when you enter a tournament.
+Rocket League is a game developed by Psyonix where rocket powered cars play soccer in an enclosed indoor soccer style arena. In their non-ranked team based modes, when a human player leaves they are replaced by Psyonix's hard-coded AI. The AI, unfortunately, is significantly worse than the 50th percentile player even at its highest difficulty. This leads to disadvantaged teams upon bot insertion in the upper echelons of player skill tiers. A strong player community, RL Bot, exists and is doing their best to build stronger AI. While hard coded bots can handily beat Psyonix AI, they are still only as good as the average RL player. The holy grail of the RL Bot community is a bot built on machine learning techniques, as policy networks in other games have achieved mastery given enough time in tuning, with one of the first being AlphaStar in Starcraft II. 
 
-In order to get auto-starting to work you will need to do the following things.
- - Build your bot executable.
- - Set the `cpp_executable_path` field in `rlbot/CppPythonAgent.cfg` so it points to the bot executable. It is recommended to copy your bot executable to the `rlbot` folder to make this process easier.
- 
-## Notes:
-  - People might have issues when trying to run your bot if you have compiled it in debug mode. It is better to compile in release mode when you want to share your bot with others.
+## Primary Objectives
+
+In July of this year, Google Research released an Imitation Learning framework named `falken`. The stated purpose of this framework is to allow game developers to reduce manual QA test time by teaching AI to play their games, allowing it to continuously replay the game and search for bugs. In this project, this framework is instead applied in learning to play Rocket League, interfacing with the game state through the `RLBot` framework, as a proof of concept. The result is encouraging enough to pursue, with a lofty goal of using player data from each skill tier as 'expert' demonstration data in order to train AI appropriate to each player skill tier.
+
+## Current Performance
+
+To learn, the `falken` service is first provided with demonstration data containing Actions and Observables which it uses to train a brain. In this case, the provided Actions are the throttle and steering, and the Observables are the car and ball's rotations and positions. The demonstration data is provided by a slightly modified At-Ball agent, wherein the bot is hard-coded to turn until the bot facing direction is toward the ball while continuously holding the throttle. When the car touches the ball, or the training episode reaches a maximum length, the ball and car are reset to random locations and orientations in the arena. After some time, control is given from the At-Ball agent to the brain, and the brain takes in the Observables and outputs the Actions. More training frames are recorded while under brain control, and a model is created. The bot then enters an evaluation session where it creates a summary map of the brain's performance and saves a snapshot of the brain's policy state, which can be reloaded for later use.
+
+#### ATBA Agent Example:
+
+
+
+#### Switching Control Example:
+
+
+
+#### Brain Success Examples:
+
+
+
+
+## Growth Areas
+
+While there was success in combining the above frameworks, there remains challenges related to the implementation. The `falken` framework is meant for game developers; people who have access to the source game files. Not being a developer at Psyonix, I do not have that access. Thus, I must inject `falken` as a listener through a C++ bot within the RL Bot framework, leading to imperfections in the data provided to the bot due to missed ticks, and crashes during learning, both impeding progress. Further development could yield workarounds and smooth out some of these issues; as the available time for working on this project was under a month, it was not possible to pursue many avenues of improvement.
+
+Yet, the success seen thus far is encouraging. The success states reached above were achieved with minimal training of only a couple minutes at normal game speed. While the player skill cap is much higher than an At-Ball agent can demonstrate, and the bot currently does not consider many of the more complicated aspects of the player's ability to control the car, this proof of concept confirms that this service is capable of learning at least some facets of Rocket League.
+
