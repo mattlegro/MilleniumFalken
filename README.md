@@ -19,17 +19,13 @@ https://user-images.githubusercontent.com/71366779/132915451-9dd456aa-1c2b-46a4-
 
 #### Switching Control Example:
 
-
-https://user-images.githubusercontent.com/71366779/132915636-df519da4-b284-401d-a98a-ef2e152db2f8.mp4
-
+https://user-images.githubusercontent.com/71366779/132915516-614d0724-0624-4e1c-991d-2d421cb89e49.mp4
 
 #### Brain Success Examples:
 
 https://user-images.githubusercontent.com/71366779/132915659-e9f2ec57-8206-4b4f-8f9c-14ba438d9bab.mp4
 
-
-https://user-images.githubusercontent.com/71366779/132915516-614d0724-0624-4e1c-991d-2d421cb89e49.mp4
-
+https://user-images.githubusercontent.com/71366779/132915636-df519da4-b284-401d-a98a-ef2e152db2f8.mp4
 
 ## Growth Areas
 
