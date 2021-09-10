@@ -7,7 +7,7 @@ Rocket League is a game developed by Psyonix where rocket powered cars play socc
 
 ## Primary Objectives
 
-In July of this year, Google Research released an Imitation Learning framework named `falken`. The stated purpose of this framework is to allow game developers to reduce manual QA test time by teaching AI to play their games, allowing it to continuously replay the game and search for bugs. In this project, this framework is instead applied in learning to play Rocket League, interfacing with the game state through the `RLBot` framework, as a proof of concept. The result is encouraging enough to pursue, with a lofty goal of using player data from each skill tier as 'expert' demonstration data in order to train AI appropriate to each player skill tier.
+In July of this year, Google Research released an Imitation Learning framework named `falken`. The stated purpose of this framework is to allow game developers to reduce manual QA test time by teaching AI to play their games, allowing it to continuously replay the game and search for bugs. In this project, this framework is instead applied in learning to play Rocket League, interfacing with the game state through the `RLBot` framework, as a proof of concept. The result, in this case an AI named MilleniumFalken, is encouraging enough to pursue, with a lofty goal of using player data from each skill tier as 'expert' demonstration data in order to train AI appropriate to each player skill tier.
 
 ## Current Performance
 
