@@ -25,8 +25,6 @@ https://user-images.githubusercontent.com/71366779/132915516-614d0724-0624-4e1c-
 
 https://user-images.githubusercontent.com/71366779/132915659-e9f2ec57-8206-4b4f-8f9c-14ba438d9bab.mp4
 
-https://user-images.githubusercontent.com/71366779/132915636-df519da4-b284-401d-a98a-ef2e152db2f8.mp4
-
 ## Growth Areas
 
 While there was success in combining the above frameworks, there remains challenges related to the implementation. The `falken` framework is meant for game developers; people who have access to the source game files. Not being a developer at Psyonix, I do not have that access. Thus, I must inject `falken` as a listener through a C++ bot within the RL Bot framework, leading to imperfections in the data provided to the bot due to missed ticks, and crashes during learning, both impeding progress. Further development could yield workarounds and smooth out some of these issues; as the available time for working on this project was under a month, it was not possible to pursue many avenues of improvement.
